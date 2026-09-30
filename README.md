@@ -82,30 +82,28 @@ npm install
 
 ## Database Configuration
 
-Create a MySQL database with the following name:
+The current local `.env` uses the existing MySQL database `to_do_list_db`. Keep that database name when continuing the Laboratory 1 setup. For a fresh local installation, create the database first and set `DB_DATABASE` to its name in `.env`.
 
 ```text
-to_do_list_system
+to_do_list_db
 ```
 
-Update the database values in `.env`:
+Confirm the non-secret connection settings in `.env`:
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=to_do_list_system
-DB_USERNAME=root
-DB_PASSWORD=
+DB_DATABASE=to_do_list_db
 ```
 
-Set `DB_PASSWORD` to your local MySQL password if your MySQL installation requires one.
+Keep your local username and password in `.env`; never commit or publish that file or its credentials.
 
 ## Database Import Instructions
 
 ### Recommended: Import Using Laravel Migrations
 
-This project includes migrations for the application tables, including the tasks table. After configuring `.env`, run:
+This project includes migrations for the application tables, including the tasks and requests tables. After configuring `.env`, run:
 
 ```bash
 php artisan migrate
@@ -138,6 +136,81 @@ Get-Content .\database.sql | mysql -u root -p to_do_list_system
 ```
 
 This repository uses Laravel migrations as the primary database setup method. No separate SQL dump is required for a fresh installation.
+
+## Laboratory 2: Requests Data Model
+
+The `requests` table stores request details, their current state, and Laravel creation/update timestamps. The local database used for verification is `to_do_list_db`.
+
+### User stories and acceptance criteria
+
+**Requester:** As a requester, I want to submit my contact details, requested item, quantity, and purpose so that the request is recorded for review.
+
+- A saved request contains a requester name of at most 100 characters, email of at most 255 characters, item name of at most 150 characters, quantity, and a purpose.
+- A new request without an explicitly supplied status is stored as `pending`.
+
+**Staff reviewer:** As a staff reviewer, I want each request's details and current status stored together so that I can identify what needs review.
+
+- Each stored request exposes its requester name, email, item name, quantity, purpose, and status.
+- The status field stores up to 20 characters and defaults to `pending` for new requests.
+
+**Record keeper:** As a record keeper, I want each request to have a unique identifier and timestamps so that I can distinguish records and track when they changed.
+
+- Every saved request receives a unique primary-key ID.
+- `created_at` and `updated_at` are populated when a request is created; `updated_at` changes when the record is updated.
+
+### Table diagram
+
+```mermaid
+erDiagram
+	REQUESTS {
+		unsignedInteger id PK
+		string requester_name "100, required"
+		string requester_email "255, required"
+		string item_name "150, required"
+		unsignedInteger quantity "required"
+		text purpose "required"
+		string status "20, default pending"
+		timestamp created_at
+		timestamp updated_at
+	}
+```
+
+### Data dictionary
+
+| Field | Data type | Constraints | Purpose |
+| --- | --- | --- | --- |
+| `id` | unsigned big integer | Primary key; auto-increment; unique | Unique request number. |
+| `requester_name` | string, 100 characters | Required | Person submitting the request. |
+| `requester_email` | string, 255 characters | Required | Requester's contact address. |
+| `item_name` | string, 150 characters | Required | Requested item or service. |
+| `quantity` | unsigned integer | Required; application rule must require a value greater than zero | Number of items or units requested. |
+| `purpose` | text | Required | Reason for the request. |
+| `status` | string, 20 characters | Required; defaults to `pending` | Current request state. |
+| `created_at` | timestamp | Nullable Laravel timestamp | When the request was created. |
+| `updated_at` | timestamp | Nullable Laravel timestamp | When the request was last updated. |
+
+An unsigned integer disallows negative quantities but still permits zero, so the later application validation must require quantity to be greater than zero. New requests begin as `pending` because they have not yet been reviewed; the database default also supplies this state when an insert omits `status`.
+
+### Migration and verification
+
+The migration is `database/migrations/2026_09_30_000000_create_requests_table.php`. It creates the table in `up()` and drops it in `down()` so the migration can be rolled back. Existing records must not be deleted to resolve a table-name conflict; check the active database and table before applying it.
+
+Run and verify the migration:
+
+```bash
+php artisan migrate
+php artisan migrate:status
+```
+
+In phpMyAdmin or another MySQL client, select `to_do_list_db`, inspect the `requests` structure, and verify the columns and types above. To display the sample records:
+
+```sql
+SELECT id, requester_name, item_name, quantity, status FROM requests;
+```
+
+For the default-status check, insert at least one sample request without specifying `status`, then verify that its stored status is `pending`. All sample quantities must be positive.
+
+The `.env` file contains local database credentials, is excluded by `.gitignore`, and must not be included in GitHub screenshots or submissions.
 
 ## Commands Needed to Run the Project
 
