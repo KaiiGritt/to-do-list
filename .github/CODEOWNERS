@@ -1,0 +1,7 @@
+# Repository administrators must grant both listed collaborators write access for review requests.
+/app/Policies/ServiceRequestPolicy.php @KaiiGritt @Celena0402
+/app/Http/Controllers/ServiceRequestController.php @KaiiGritt @Celena0402
+/routes/web.php @KaiiGritt @Celena0402
+/resources/views/service-requests/ @KaiiGritt @Celena0402
+/tests/Feature/ServiceRequestAccessTest.php @Celena0402 @KaiiGritt
+/README.md @KaiiGritt @Celena0402
