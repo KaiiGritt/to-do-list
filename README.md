@@ -306,9 +306,9 @@ Run the suite with `php artisan test`; run a production asset build with `npm ru
 
 ### Pull request and conflict-resolution gate
 
-Open a pull request from `feature/lab3-secure-requests` to `main`, link issue #2, and obtain a recorded approval from Celena0402 after the final push. The protected `main` branch requires an approved pull request and code-owner review; the author must not approve their own changes.
+The protected `main` branch requires a pull request, a recorded approval from a reviewer with write access, and code-owner review; the author must not approve their own changes. The Laboratory 3 implementation pull request is #3 and must be reviewed again after its latest feature-branch commits.
 
-No instructor-prepared divergent README change was present on `origin/main` when this work was checked. Do not manufacture a conflict or claim one was resolved. Before the conflict-resolution checkpoint, obtain the instructor's prepared conflicting branch, fetch/merge it into the feature branch, capture its actual conflict markers, preserve both intended instructions, resolve, test, and push. If no prepared branch is supplied, record that blocker and request it from the instructor.
+The README conflict checkpoint was completed using reviewed preparation pull requests #4 and #5. PR #4 added the shared baseline instruction to `main`; PR #5 replaced that line with the administrator verification instruction on `main`. Merging `origin/main` into `feature/lab3-secure-requests` then produced the expected content conflict in this file. The captured conflict was resolved by retaining both the student-ownership and administrator-status verification instructions under this heading; conflict markers were removed, and the resolution was committed on the feature branch. Capture and retain the terminal conflict/status, conflict-marker, and resolved-file evidence with the Laboratory 3 submission. Re-request peer approval on PR #3 because its previous approval was dismissed after the feature branch changed.
 
 ## Commands Needed to Run the Project
 
