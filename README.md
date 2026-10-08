@@ -115,6 +115,8 @@ To reset and recreate all database tables during development:
 php artisan migrate:fresh
 ```
 
+**Do not run `migrate:fresh` against the Laboratory 1 or Laboratory 2 database.** It drops application tables and their records. Use the additive migrations below with `php artisan migrate --seed` to keep existing records.
+
 To migrate and seed the database, if seed data is available:
 
 ```bash
@@ -139,7 +141,7 @@ This repository uses Laravel migrations as the primary database setup method. No
 
 ## Laboratory 2: Requests Data Model
 
-The `requests` table stores request details, their current state, and Laravel creation/update timestamps. The local database used for verification is `to_do_list_db`.
+The `requests` table stores request details, their current state, and Laravel creation/update timestamps. The local database used for verification is `to_do_list_db`. A later preparation migration adds a nullable `user_id` foreign key so older Laboratory 2 rows remain unchanged and can remain unassigned.
 
 ### User stories and acceptance criteria
 
@@ -164,6 +166,7 @@ The `requests` table stores request details, their current state, and Laravel cr
 erDiagram
 	REQUESTS {
 		unsignedInteger id PK
+		unsignedBigInteger user_id FK "nullable for existing rows"
 		string requester_name "100, required"
 		string requester_email "255, required"
 		string item_name "150, required"
@@ -180,6 +183,7 @@ erDiagram
 | Field | Data type | Constraints | Purpose |
 | --- | --- | --- | --- |
 | `id` | unsigned big integer | Primary key; auto-increment; unique | Unique request number. |
+| `user_id` | unsigned big integer | Nullable foreign key to `users.id`; set null when the user is deleted | Student who owns the request; null for pre-existing unassigned rows. |
 | `requester_name` | string, 100 characters | Required | Person submitting the request. |
 | `requester_email` | string, 255 characters | Required | Requester's contact address. |
 | `item_name` | string, 150 characters | Required | Requested item or service. |
@@ -211,6 +215,24 @@ SELECT id, requester_name, item_name, quantity, status FROM requests;
 For the default-status check, insert at least one sample request without specifying `status`, then verify that its stored status is `pending`. All sample quantities must be positive.
 
 The `.env` file contains local database credentials, is excluded by `.gitignore`, and must not be included in GitHub screenshots or submissions.
+
+## Starting Checkpoint: Login and Student Request Ownership
+
+Run the additive setup and seed the fictional accounts:
+
+```bash
+php artisan migrate --seed
+```
+
+This creates or updates two student accounts and one administrator account through the trusted `DatabaseSeeder`; no public registration or user-controlled role assignment is provided. The `ServiceRequest` Eloquent model maps to the existing `requests` table, and each sample request is associated with its student through `user_id`. The seeder is safe to rerun and does not truncate or delete existing Laboratory 2 request rows. Existing requests retain their fields and receive a null `user_id` until deliberately assigned.
+
+| Account | Email | Password | Role |
+| --- | --- | --- | --- |
+| Avery Student | `avery.student@example.test` | `student-demo-password` | Student |
+| Jordan Student | `jordan.student@example.test` | `student-demo-password` | Student |
+| Morgan Administrator | `morgan.admin@example.test` | `admin-demo-password` | Administrator |
+
+These are fictional classroom credentials; replace them before using any real or shared deployment. Sign in at `/login`. The preparation migration can be rolled back with `php artisan migrate:rollback --step=1`; its `down()` removes only the added `requests.user_id` and `users.role` columns, not the requests table or the original Laboratory 2 columns.
 
 ## Commands Needed to Run the Project
 
