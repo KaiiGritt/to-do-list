@@ -286,4 +286,4 @@ For macOS or Linux, replace `copy .env.example .env` with `cp .env.example .env`
 
 ## Laboratory 3 Verification
 
-Verification instruction: Follow the required access checks.
+Verification instruction: Test administrator access and administrator-only status updates.
