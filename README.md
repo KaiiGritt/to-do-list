@@ -381,3 +381,7 @@ For macOS or Linux, replace `copy .env.example .env` with `cp .env.example .env`
 ## Repository
 
 [View the project on GitHub](https://github.com/KaiiGritt/to-do-list.git)
+
+## Laboratory 3 Verification
+
+Verification instruction: Follow the required access checks.
